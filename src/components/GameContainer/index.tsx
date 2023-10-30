@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import MainGrid from '../MainGrid';
-import ControllerGrid from '../Controller';
+import ControllerGrid from '../ControllerGrid';
 
 const GameContainer = () => {
   const [activeRow, setActiveRow] = useState(0);
@@ -27,7 +27,7 @@ const GameContainer = () => {
 
   return (
     <div className="min-h-screen flex flex-row items-center justify-center">
-      <MainGrid activeRow={activeRow} activeCol={activeCol} />
+      <MainGrid activeRow={activeRow} activeCol={activeCol} data-testid={`cell-${3 * activeRow + activeCol + 1}`} />
       <ControllerGrid moveActiveCell={handleArrowClick} />
     </div>
   );
