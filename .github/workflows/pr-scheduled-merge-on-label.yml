@@ -2,8 +2,8 @@ name: Scheduled Merge
 
 on:
   schedule:
-    # Runs at 5 PM UTC, equivalent to 9 AM PT outside DST.
-    - cron: '25 6 * * *'
+    # Runs at 5 PM UTC, equivalent to 11 AM PT outside DST.
+    - cron: '00 7 * * *'
 
 permissions:
   contents: write
