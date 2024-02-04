@@ -1,9 +1,7 @@
-name: Scheduled Merge
+name: Manual Workflow Example
 
 on:
-  schedule:
-    # Runs at 5 PM UTC, equivalent to 11 AM PT outside DST.
-    - cron: '35 7 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,33 +11,40 @@ jobs:
   merge_approved_prs:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - run: echo "This is a manually triggered workflow."
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+      # Checkout your repository
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup GitHub CLI
-      run: |
-        if ! gh --version; then
-          sudo apt-get install gh
-        fi
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
 
-    - name: Authenticate GitHub CLI
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-
-    - name: Merge PRs labeled as 'ready-to-merge'
-      run: |
-        gh pr list --label "ready-to-merge" --state open --base main --json number,url |
-        jq -r '.[] | .number + " " + .url' |
-        while read -r number url; do
-          day=$(date +%u)
-          if [ "$day" -ge 1 ] && [ "$day" -le 4 ]; then
-            gh pr merge "$number" --merge --admin
-            echo "Merged PR $number: $url"
-          else
-            echo "Skipping merge for PR $number: $url, as today is not within the allowed merge window."
+      # Setup GitHub CLI
+      - name: Setup GitHub CLI
+        run: |
+          if ! gh --version; then
+            sudo apt-get install gh
           fi
-        done
+
+      # Authenticate GitHub CLI using GITHUB_TOKEN
+      - name: Authenticate GitHub CLI
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+      # Merge PRs labeled as 'ready-to-merge'
+      - name: Merge PRs labeled as 'ready-to-merge'
+        run: |
+          gh pr list --label "ready-to-merge" --state open --base main --json number,url |
+          jq -r '.[] | .number + " " + .url' |
+          while read -r number url; do
+            day=$(date +%u)
+            if [ "$day" -ge 1 ] && [ "$day" -le 4 ]; then
+              gh pr merge "$number" --merge --admin
+              echo "Merged PR $number: $url"
+            else
+              echo "Skipping merge for PR $number: $url, as today is not within the allowed merge window."
+            fi
+          done
