@@ -1,22 +1,17 @@
-name: Scheduled Merge Workflow
+name: Auto Merge on Label
 
 on:
-  schedule:
-    # Runs at 5 PM UTC, which is 9 AM PST (UTC-8)
-    - cron: '0 17 * * *'
+  pull_request_target:
+    types: [labeled]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  merge_approved_prs:
+  auto_merge:
     runs-on: ubuntu-latest
     steps:
-      # Echo the current time for verification
-      - name: Echo current time
-        run: echo "Running at $(date)"
-
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,22 +22,27 @@ jobs:
         with:
           node-version: '20'
 
-      # Optionally setup GitHub CLI if needed
+      # Conditionally run the next steps only if the 'ready-to-merge' label was added
+      - name: Check if 'ready-to-merge' label was added
+        if: ${{ github.event.label.name == 'ready-to-merge' }}
+        run: echo "'ready-to-merge' label was added to PR #${{ github.event.pull_request.number }}."
+
+      # Setup GitHub CLI
       - name: Setup GitHub CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gh
+          if ! gh --version; then
+            sudo apt-get install gh
+          fi
 
-      # Authenticate GitHub CLI
+      # Authenticate GitHub CLI using GITHUB_TOKEN
       - name: Authenticate GitHub CLI
         run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
       # Merge PRs labeled as 'ready-to-merge'
-      - name: Merge PRs labeled as 'ready-to-merge'
+      - name: Merge PR labeled as 'ready-to-merge'
+        if: ${{ github.event.label.name == 'ready-to-merge' }}
         run: |
-          gh pr list --label "ready-to-merge" --state open --base main --json number,url |
-          jq -r '.[] | .number + " " + .url' |
-          while read -r number url; do
-            gh pr merge "$number" --merge --admin
-            echo "Merged PR $number: $url"
-          done
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_URL=${{ github.event.pull_request.html_url }}
+          gh pr merge "$PR_NUMBER" --merge --admin
+          echo "Merged PR $PR_NUMBER: $PR_URL"
