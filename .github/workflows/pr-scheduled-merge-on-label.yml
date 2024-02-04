@@ -2,8 +2,12 @@ name: Scheduled Merge
 
 on:
   schedule:
-    # Runs at 5 PM UTC, equivalent to 9 AM PT outside DST.
-    - cron: '34 5 * * *'
+    # Runs at 5 PM UTC, equivalent to 11 AM PT outside DST.
+    - cron: '30 7 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   merge_approved_prs:
@@ -34,9 +38,3 @@ jobs:
             echo "Skipping merge for PR $number: $url, as today is not within the allowed merge window."
           fi
         done
-
-    - name: Notify Slack about PR Merge
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      run: |
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Deploying: Service: storefront Description: New changes. PR: ${{ github.event.pull_request.html_url }}"} Owner: Rollback: Revert pr' $SLACK_WEBHOOK_URL

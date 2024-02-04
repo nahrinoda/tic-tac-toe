@@ -35,6 +35,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-## TODO: REMOVE THIS LINE
 
-Just testing the pr-scheduled-merge-on-label and will delete this section.
+## TESTING:
+
+TODO: delete this section, should merge at 11:30pm....
