@@ -3,7 +3,7 @@ name: Scheduled Merge
 on:
   schedule:
     # Runs at 5 PM UTC, equivalent to 9 AM PT outside DST.
-    - cron: '00 6 * * *'
+    - cron: '10 6 * * *'
 
 jobs:
   merge_approved_prs:
