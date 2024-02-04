@@ -1,7 +1,9 @@
-name: Manual Workflow Example
+name: Scheduled Merge Workflow
 
 on:
-  workflow_dispatch:
+  schedule:
+    # Runs at 5 PM UTC, which is 9 AM PST (UTC-8)
+    - cron: '0 17 * * *'
 
 permissions:
   contents: write
@@ -11,26 +13,27 @@ jobs:
   merge_approved_prs:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "This is a manually triggered workflow."
+      # Echo the current time for verification
+      - name: Echo current time
+        run: echo "Running at $(date)"
 
-      # Checkout your repository
-      - name: Checkout
+      # Checkout the repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Node.js
+      # Setup Node.js 20
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # Setup GitHub CLI
+      # Optionally setup GitHub CLI if needed
       - name: Setup GitHub CLI
         run: |
-          if ! gh --version; then
-            sudo apt-get install gh
-          fi
+          sudo apt-get update
+          sudo apt-get install -y gh
 
-      # Authenticate GitHub CLI using GITHUB_TOKEN
+      # Authenticate GitHub CLI
       - name: Authenticate GitHub CLI
         run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
@@ -40,11 +43,6 @@ jobs:
           gh pr list --label "ready-to-merge" --state open --base main --json number,url |
           jq -r '.[] | .number + " " + .url' |
           while read -r number url; do
-            day=$(date +%u)
-            if [ "$day" -ge 1 ] && [ "$day" -le 4 ]; then
-              gh pr merge "$number" --merge --admin
-              echo "Merged PR $number: $url"
-            else
-              echo "Skipping merge for PR $number: $url, as today is not within the allowed merge window."
-            fi
+            gh pr merge "$number" --merge --admin
+            echo "Merged PR $number: $url"
           done
