@@ -20,12 +20,12 @@ jobs:
         - name: Setup Node.js
           uses: actions/setup-node@v3
           with:
-            node-version: '20'
+            node-version: "20"
 
-        # Conditionally run the next steps only if the 'ready-to-merge' label was added
-        - name: Check if 'ready-to-merge' label was added
-          if: ${{ github.event.label.name == 'ready-to-merge' }}
-          run: echo "'ready-to-merge' label was added to PR."
+        # Conditionally run the next steps only if the "ready-to-merge" label was added
+        - name: Check if "ready-to-merge" label was added
+          if: ${{ github.event.label.name == "ready-to-merge" }}
+          run: echo "ready-to-merge label was added to PR."
 
         # Setup GitHub CLI
         - name: Setup GitHub CLI
@@ -38,9 +38,9 @@ jobs:
         - name: Authenticate GitHub CLI
           run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-        # Merge PRs labeled as 'ready-to-merge'
-        - name: Merge PR labeled as 'ready-to-merge'
-          if: ${{ github.event.label.name == 'ready-to-merge' }}
+        # Merge PRs labeled as "ready-to-merge"
+        - name: Merge PR labeled as "ready-to-merge"
+          if: ${{ github.event.label.name == "ready-to-merge" }}
           run: |
             PR_NUMBER=${{ github.event.pull_request.number }}
             PR_URL=${{ github.event.pull_request.html_url }}
