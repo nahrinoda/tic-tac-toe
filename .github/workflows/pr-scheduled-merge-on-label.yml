@@ -24,7 +24,7 @@ jobs:
 
       # Conditionally run the next steps only if the "ready-to-merge" label was added
       - name: Check if "ready-to-merge" label was added
-        if: ${{ github.event.label.name == ready-to-merge }}
+        if: ${{ github.event.label.name == 'ready-to-merge' }}
         run: echo "ready-to-merge label was added to PR."
 
       # Setup GitHub CLI
@@ -40,7 +40,7 @@ jobs:
 
       # Merge PRs labeled as "ready-to-merge"
       - name: Merge PR labeled as "ready-to-merge"
-        if: ${{ github.event.label.name == ready-to-merge }}
+        if: ${{ github.event.label.name == 'ready-to-merge' }}
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           PR_URL=${{ github.event.pull_request.html_url }}
