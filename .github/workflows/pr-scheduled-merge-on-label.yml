@@ -1,0 +1,42 @@
+name: Scheduled Merge
+
+on:
+  schedule:
+    # Runs at 5 PM UTC, equivalent to 9 AM PT outside DST.
+    - cron: '0 17 * * 1-4'
+
+jobs:
+  merge_approved_prs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup GitHub CLI
+      run: |
+        if ! gh --version; then
+          sudo apt-get install gh
+        fi
+
+    - name: Authenticate GitHub CLI
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+    - name: Merge PRs labeled as 'approved'
+      run: |
+        gh pr list --label "approved" --state open --base main --json number,url |
+        jq -r '.[] | .number + " " + .url' |
+        while read -r number url; do
+          day=$(date +%u)
+          if [ "$day" -ge 1 ] && [ "$day" -le 4 ]; then
+            gh pr merge "$number" --merge --admin
+            echo "Merged PR $number: $url"
+          else
+            echo "Skipping merge for PR $number: $url, as today is not within the allowed merge window."
+          fi
+        done
+
+    - name: Notify Slack about PR Merge
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Deploying: Service: storefront Description: New changes. PR: ${{ github.event.pull_request.html_url }}"} Owner: Rollback: Revert pr' $SLACK_WEBHOOK_URL
