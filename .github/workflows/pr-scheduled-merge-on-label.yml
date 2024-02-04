@@ -23,9 +23,9 @@ jobs:
           node-version: '20'
 
       # Conditionally run the next steps only if the 'ready-to-merge' label was added
-      - name: Check if 'ready-to-merge' label was added
-        if: ${{ github.event.label.name == 'ready-to-merge' }}
-        run: echo "'ready-to-merge' label was added to PR #${{ github.event.pull_request.number }}."
+    - name: Check if 'ready-to-merge' label was added
+      if: ${{ github.event.label.name == 'ready-to-merge' }}
+      run: echo "'ready-to-merge' label was added to PR."
 
       # Setup GitHub CLI
       - name: Setup GitHub CLI
