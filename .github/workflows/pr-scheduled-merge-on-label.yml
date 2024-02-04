@@ -3,7 +3,11 @@ name: Scheduled Merge
 on:
   schedule:
     # Runs at 5 PM UTC, equivalent to 9 AM PT outside DST.
-    - cron: '10 6 * * *'
+    - cron: '25 6 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   merge_approved_prs:
