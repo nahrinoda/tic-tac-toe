@@ -38,4 +38,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## TESTING:
 
-TODO: delete this section, should merge at 9:00am PST. New PR to test
+TODO: delete this section, should merge automatically on Sunday the 4th of Feb.
